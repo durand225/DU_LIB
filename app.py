@@ -2,10 +2,13 @@ from flask import Flask, session, request, render_template, redirect, url_for
 import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///donnes.db'
 app.config['SECRET_KEY'] = "azertyuiopazertyuioazertyuiop"
 db = SQLAlchemy(app)
+
+# creation de mon model(user)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -25,6 +28,9 @@ with app.app_context():
 @app.route('/')
 def index():
     return 'Je suis la page index'
+
+
+# creation de la base de donnée de l'utilisateur
 
 
 @app.route('/register',methods=['GET','POST'])
@@ -60,11 +66,39 @@ def login():
     return render_template('login.html')
 
 
+
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    if session['name']:
+        user = User.query.filter_by(email=session['email']).first()
+        return render_template('dashboard.html' ,user=user)
     
+    return redirect('/logout')
 
+
+@app.route('/logout')
+def logout():
+    session.pop('email',None)
+    return redirect('/login')
+
+
+
+# jai toucher le dashboard et le logout
+
+# @app.route('/dashboard')
+# def dashboard():
+#     if session['name']:
+#         user = User.query.filter_by(email=session['email']).first()
+#         return render_template('dashboard.html' ,user=user)
+    
+#     return redirect('/logout')
+
+
+# @app.route('/logout')
+# def logout():
+#     session.pop('email',None)
+#     return redirect('/login')
+    
 
 
 
